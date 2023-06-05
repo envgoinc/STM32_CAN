@@ -130,10 +130,10 @@ void STM32_CAN::begin( bool retransmission ) {
     }
 
     // NVIC configuration for CAN1 Reception complete interrupt
-    HAL_NVIC_SetPriority(CAN1_RX0_IRQn, 15, 0); // 15 is lowest possible priority
+    HAL_NVIC_SetPriority(CAN1_RX0_IRQn, 5, 0); // 15 is lowest possible priority
     HAL_NVIC_EnableIRQ(CAN1_RX0_IRQn );
     // NVIC configuration for CAN1 Transmission complete interrupt
-    HAL_NVIC_SetPriority(CAN1_TX_IRQn, 15, 0); // 15 is lowest possible priority
+    HAL_NVIC_SetPriority(CAN1_TX_IRQn, 5, 0); // 15 is lowest possible priority
     HAL_NVIC_EnableIRQ(CAN1_TX_IRQn);
 
     n_pCanHandle->Instance = CAN1;
@@ -183,10 +183,12 @@ void STM32_CAN::begin( bool retransmission ) {
     }
 
     // NVIC configuration for CAN2 Reception complete interrupt
-    HAL_NVIC_SetPriority(CAN2_RX0_IRQn, 15, 0); // 15 is lowest possible priority
+    HAL_NVIC_SetPriority(CAN2_RX0_IRQn, 5, 0); // 15 is lowest possible priority
+    HAL_NVIC_SetPriority(CAN2_RX1_IRQn, 5, 0); // 15 is lowest possible priority
     HAL_NVIC_EnableIRQ(CAN2_RX0_IRQn );
+    HAL_NVIC_DisableIRQ(CAN2_RX1_IRQn );
     // NVIC configuration for CAN2 Transmission complete interrupt
-    HAL_NVIC_SetPriority(CAN2_TX_IRQn, 15, 0); // 15 is lowest possible priority
+    HAL_NVIC_SetPriority(CAN2_TX_IRQn, 5, 0); // 15 is lowest possible priority
     HAL_NVIC_EnableIRQ(CAN2_TX_IRQn);
 
     n_pCanHandle->Instance = CAN2;
@@ -218,10 +220,10 @@ void STM32_CAN::begin( bool retransmission ) {
     }
 
     // NVIC configuration for CAN3 Reception complete interrupt
-    HAL_NVIC_SetPriority(CAN3_RX0_IRQn, 15, 0); // 15 is lowest possible priority
+    HAL_NVIC_SetPriority(CAN3_RX0_IRQn, 5, 0); // 15 is lowest possible priority
     HAL_NVIC_EnableIRQ(CAN3_RX0_IRQn );
     // NVIC configuration for CAN3 Transmission complete interrupt
-    HAL_NVIC_SetPriority(CAN3_TX_IRQn, 15, 0); // 15 is lowest possible priority
+    HAL_NVIC_SetPriority(CAN3_TX_IRQn, 5, 0); // 15 is lowest possible priority
     HAL_NVIC_EnableIRQ(CAN3_TX_IRQn);
 
     n_pCanHandle->Instance = CAN3;
@@ -800,7 +802,7 @@ extern "C" void HAL_CAN_TxMailbox0CompleteCallback( CAN_HandleTypeDef *CanHandle
 {
   CAN_message_t txmsg;
   // use correct CAN instance
-  if (CanHandle->Instance == CAN1) 
+  if (CanHandle->Instance == CAN1)
   {
     if (_CAN1->removeFromRingBuffer(_CAN1->txRing, txmsg))
     {
@@ -808,7 +810,7 @@ extern "C" void HAL_CAN_TxMailbox0CompleteCallback( CAN_HandleTypeDef *CanHandle
     }
   }
 #ifdef CAN2
-  else if (CanHandle->Instance == CAN2) 
+  else if (CanHandle->Instance == CAN2)
   {
     if (_CAN2->removeFromRingBuffer(_CAN2->txRing, txmsg))
     {
@@ -817,7 +819,7 @@ extern "C" void HAL_CAN_TxMailbox0CompleteCallback( CAN_HandleTypeDef *CanHandle
   }
 #endif
 #ifdef CAN3
-  else if (CanHandle->Instance == CAN3) 
+  else if (CanHandle->Instance == CAN3)
   {
     if (_CAN3->removeFromRingBuffer(_CAN3->txRing, txmsg))
     {
@@ -831,7 +833,7 @@ extern "C" void HAL_CAN_TxMailbox1CompleteCallback( CAN_HandleTypeDef *CanHandle
 {
   CAN_message_t txmsg;
   // use correct CAN instance
-  if (CanHandle->Instance == CAN1) 
+  if (CanHandle->Instance == CAN1)
   {
     if (_CAN1->removeFromRingBuffer(_CAN1->txRing, txmsg))
     {
@@ -839,7 +841,7 @@ extern "C" void HAL_CAN_TxMailbox1CompleteCallback( CAN_HandleTypeDef *CanHandle
     }
   }
 #ifdef CAN2
-  else if (CanHandle->Instance == CAN2) 
+  else if (CanHandle->Instance == CAN2)
   {
     if (_CAN2->removeFromRingBuffer(_CAN2->txRing, txmsg))
     {
@@ -848,7 +850,7 @@ extern "C" void HAL_CAN_TxMailbox1CompleteCallback( CAN_HandleTypeDef *CanHandle
   }
 #endif
 #ifdef CAN3
-  else if (CanHandle->Instance == CAN3) 
+  else if (CanHandle->Instance == CAN3)
   {
     if (_CAN3->removeFromRingBuffer(_CAN3->txRing, txmsg))
     {
@@ -862,7 +864,7 @@ extern "C" void HAL_CAN_TxMailbox2CompleteCallback( CAN_HandleTypeDef *CanHandle
 {
   CAN_message_t txmsg;
   // use correct CAN instance
-  if (CanHandle->Instance == CAN1) 
+  if (CanHandle->Instance == CAN1)
   {
     if (_CAN1->removeFromRingBuffer(_CAN1->txRing, txmsg))
     {
@@ -870,7 +872,7 @@ extern "C" void HAL_CAN_TxMailbox2CompleteCallback( CAN_HandleTypeDef *CanHandle
     }
   }
 #ifdef CAN2
-  else if (CanHandle->Instance == CAN2) 
+  else if (CanHandle->Instance == CAN2)
   {
     if (_CAN2->removeFromRingBuffer(_CAN2->txRing, txmsg))
     {
@@ -879,7 +881,7 @@ extern "C" void HAL_CAN_TxMailbox2CompleteCallback( CAN_HandleTypeDef *CanHandle
   }
 #endif
 #ifdef CAN3
-  else if (CanHandle->Instance == CAN3) 
+  else if (CanHandle->Instance == CAN3)
   {
     if (_CAN3->removeFromRingBuffer(_CAN3->txRing, txmsg))
     {
