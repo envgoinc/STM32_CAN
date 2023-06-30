@@ -142,6 +142,9 @@ class STM32_CAN {
     void enableMBInterrupts();
     void disableMBInterrupts();
 
+    uint32_t getCanError();
+    uint32_t getCanErrorCount();
+
     // These are public because these are also used from interrupts.
     typedef struct RingbufferTypeDef {
       volatile uint16_t head;
