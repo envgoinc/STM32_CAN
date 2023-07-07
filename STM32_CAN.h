@@ -20,6 +20,7 @@ to same folder with sketch and haven #define HAL_CAN_MODULE_ENABLED there. See e
 #define STM32_CAN_H
 
 #include <Arduino.h>
+#include "LibPrintf.h"
 
 // This struct is directly copied from Teensy FlexCAN library to retain compatibility with it. Not all are in use with STM32.
 // Source: https://github.com/tonton81/FlexCAN_T4/
@@ -142,6 +143,8 @@ class STM32_CAN {
     void enableMBInterrupts();
     void disableMBInterrupts();
 
+    void setCanError(uint32_t error);
+    void setCanErrorCount(uint32_t count);
     uint32_t getCanError();
     uint32_t getCanErrorCount();
 
@@ -162,6 +165,9 @@ class STM32_CAN {
   protected:
     uint16_t sizeRxBuffer;
     uint16_t sizeTxBuffer;
+
+    uint32_t canError = 0; // Stores latest can state
+    uint32_t canErrorCount = 0; // Can error counter
 
   private:
     void      initializeFilters();

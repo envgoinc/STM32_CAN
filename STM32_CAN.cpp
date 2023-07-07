@@ -15,9 +15,6 @@ static STM32_CAN* _CAN3 = nullptr;
 static CAN_HandleTypeDef     hcan3;
 #endif
 
-uint32_t canError; // Stores latest can state
-uint32_t canErrorCount = 0; // Can error counter
-
 STM32_CAN::STM32_CAN( CAN_TypeDef* canPort, CAN_PINS pins, RXQUEUE_TABLE rxSize, TXQUEUE_TABLE txSize ) {
 
   if (_canIsActive) { return; }
@@ -797,6 +794,14 @@ void STM32_CAN::enableFIFO(bool status)
   //Nothing to do here. The FIFO is on by default. This is just to work with code made for Teensy FlexCan.
 }
 
+void STM32_CAN::setCanError(uint32_t error){
+  canError = error;
+}
+
+void STM32_CAN::setCanErrorCount(uint32_t count){
+  canErrorCount = count;
+}
+
 uint32_t STM32_CAN::getCanError(){
   return canError;
 }
@@ -841,8 +846,26 @@ HAL_CAN_ERROR_INTERNAL        (0x00800000U)  /*!< Internal error
 // This is called by RX0_IRQHandler when there is message at RX FIFO0 buffer
 extern "C" void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *CanHandle)
 {
-  canError = CanHandle->ErrorCode;
-  canErrorCount++;
+  // use correct CAN instance
+  if (CanHandle->Instance == CAN1)
+  {
+    _CAN1->setCanError(CanHandle->ErrorCode);
+    _CAN1->setCanErrorCount(_CAN1->getCanErrorCount() + 1);
+  }
+#ifdef CAN2
+  else if (CanHandle->Instance == CAN2)
+  {
+    _CAN2->setCanError(CanHandle->ErrorCode);
+    _CAN2->setCanErrorCount(_CAN2->getCanErrorCount() + 1);
+  }
+#endif
+#ifdef CAN3
+  else if (CanHandle->Instance == CAN3)
+  {
+    _CAN3->setCanError(CanHandle->ErrorCode);
+    _CAN3->setCanErrorCount(_CAN3->getCanErrorCount() + 1);
+  }
+#endif 
 }
 
 // There is 3 TX mailboxes. Each one has own transmit complete callback function, that we use to pull next message from TX ringbuffer to be sent out in TX mailbox.
