@@ -259,6 +259,13 @@ void STM32_CAN::setBaudRate(uint32_t baud)
 
   // Activate CAN TX notification
   HAL_CAN_ActivateNotification( n_pCanHandle, CAN_IT_TX_MAILBOX_EMPTY);
+
+  // Activate CAN ERROR notification
+  HAL_CAN_ActivateNotification( n_pCanHandle, CAN_IT_ERROR);
+  HAL_CAN_ActivateNotification( n_pCanHandle, CAN_IT_BUSOFF);
+  HAL_CAN_ActivateNotification( n_pCanHandle, CAN_IT_LAST_ERROR_CODE);
+  HAL_CAN_ActivateNotification( n_pCanHandle, CAN_IT_ERROR_WARNING);
+  HAL_CAN_ActivateNotification( n_pCanHandle, CAN_IT_ERROR_PASSIVE);
 }
 
 bool STM32_CAN::write(CAN_message_t &CAN_tx_msg, bool sendMB)
@@ -298,6 +305,8 @@ bool STM32_CAN::write(CAN_message_t &CAN_tx_msg, bool sendMB)
     else { ret = false; }
   }
   __HAL_CAN_ENABLE_IT(n_pCanHandle, CAN_IT_TX_MAILBOX_EMPTY);
+
+  setCanError((uint32_t)n_pCanHandle->Instance->ESR);
   return ret;
 }
 
@@ -798,16 +807,8 @@ void STM32_CAN::setCanError(uint32_t error){
   canError = error;
 }
 
-void STM32_CAN::setCanErrorCount(uint32_t count){
-  canErrorCount = count;
-}
-
 uint32_t STM32_CAN::getCanError(){
   return canError;
-}
-
-uint32_t STM32_CAN::getCanErrorCount(){
-  return canErrorCount;
 }
 
 
@@ -849,21 +850,18 @@ extern "C" void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *CanHandle)
   // use correct CAN instance
   if (CanHandle->Instance == CAN1)
   {
-    _CAN1->setCanError(CanHandle->ErrorCode);
-    _CAN1->setCanErrorCount(_CAN1->getCanErrorCount() + 1);
+    _CAN1->setCanError(CanHandle->Instance->ESR);
   }
 #ifdef CAN2
   else if (CanHandle->Instance == CAN2)
   {
-    _CAN2->setCanError(CanHandle->ErrorCode);
-    _CAN2->setCanErrorCount(_CAN2->getCanErrorCount() + 1);
+    _CAN2->setCanError(CanHandle->Instance->ESR);
   }
 #endif
 #ifdef CAN3
   else if (CanHandle->Instance == CAN3)
   {
-    _CAN3->setCanError(CanHandle->ErrorCode);
-    _CAN3->setCanErrorCount(_CAN3->getCanErrorCount() + 1);
+    _CAN3->setCanError(CanHandle->Instance->ESR);
   }
 #endif 
 }
