@@ -163,8 +163,6 @@ class STM32_CAN {
     uint16_t sizeRxBuffer;
     uint16_t sizeTxBuffer;
 
-    uint32_t canError = 0; // Stores latest CAN ESR (error status register) register
-
   private:
     void      initializeFilters();
     bool      isInitialized() { return rx_buffer != 0; }
@@ -179,6 +177,8 @@ class STM32_CAN {
 
     volatile CAN_message_t *rx_buffer;
     volatile CAN_message_t *tx_buffer;
+
+    uint32_t canError = 0; // Stores latest CAN ESR (error status register) register
 
     static constexpr Baudrate_entry_t BAUD_RATE_TABLE_48M[] {
       {
