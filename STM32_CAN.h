@@ -142,6 +142,9 @@ class STM32_CAN {
     void enableMBInterrupts();
     void disableMBInterrupts();
 
+    void setCanError(uint32_t error);
+    uint32_t getCanError();
+
     // These are public because these are also used from interrupts.
     typedef struct RingbufferTypeDef {
       volatile uint16_t head;
@@ -174,6 +177,8 @@ class STM32_CAN {
 
     volatile CAN_message_t *rx_buffer;
     volatile CAN_message_t *tx_buffer;
+
+    uint32_t canError = 0; // Stores latest CAN ESR (error status register) register
 
     static constexpr Baudrate_entry_t BAUD_RATE_TABLE_48M[] {
       {
