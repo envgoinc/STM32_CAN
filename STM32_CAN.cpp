@@ -439,13 +439,13 @@ void STM32_CAN::initializeBuffers()
     if(isInitialized()) { return; }
 
     // set up the transmit and receive ring buffers
-    if(tx_buffer==0)
+    if(tx_buffer==nullptr)
     {
       tx_buffer=new CAN_message_t[sizeTxBuffer];
     }
     initRingBuffer(txRing, tx_buffer, sizeTxBuffer);
 
-    if(rx_buffer==0)
+    if(rx_buffer==nullptr)
     {
       rx_buffer=new CAN_message_t[sizeRxBuffer];
     }
@@ -817,31 +817,31 @@ uint32_t STM32_CAN::getCanError(){
 */
 
 /* ==== HAL CAN Errors ====
-HAL_CAN_ERROR_NONE            (0x00000000U)  //!< No error                                             
-HAL_CAN_ERROR_EWG             (0x00000001U)  //!< Protocol Error Warning                               
-HAL_CAN_ERROR_EPV             (0x00000002U)  //!< Error Passive                                        
-HAL_CAN_ERROR_BOF             (0x00000004U)  //!< Bus-off error                                        
-HAL_CAN_ERROR_STF             (0x00000008U)  //!< Stuff error                                          
-HAL_CAN_ERROR_FOR             (0x00000010U)  //!< Form error                                           
-HAL_CAN_ERROR_ACK             (0x00000020U)  //!< Acknowledgment error                                 
-HAL_CAN_ERROR_BR              (0x00000040U)  //!< Bit recessive error                                  
-HAL_CAN_ERROR_BD              (0x00000080U)  //!< Bit dominant error                                   
-HAL_CAN_ERROR_CRC             (0x00000100U)  //!< CRC error                                            
-HAL_CAN_ERROR_RX_FOV0         (0x00000200U)  //!< Rx FIFO0 overrun error                               
-HAL_CAN_ERROR_RX_FOV1         (0x00000400U)  //!< Rx FIFO1 overrun error                               
-HAL_CAN_ERROR_TX_ALST0        (0x00000800U)  //!< TxMailbox 0 transmit failure due to arbitration lost 
-HAL_CAN_ERROR_TX_TERR0        (0x00001000U)  //!< TxMailbox 0 transmit failure due to transmit error   
-HAL_CAN_ERROR_TX_ALST1        (0x00002000U)  //!< TxMailbox 1 transmit failure due to arbitration lost 
-HAL_CAN_ERROR_TX_TERR1        (0x00004000U)  //!< TxMailbox 1 transmit failure due to transmit error   
-HAL_CAN_ERROR_TX_ALST2        (0x00008000U)  //!< TxMailbox 2 transmit failure due to arbitration lost 
-HAL_CAN_ERROR_TX_TERR2        (0x00010000U)  //!< TxMailbox 2 transmit failure due to transmit error   
-HAL_CAN_ERROR_TIMEOUT         (0x00020000U)  //!< Timeout error                                        
-HAL_CAN_ERROR_NOT_INITIALIZED (0x00040000U)  //!< Peripheral not initialized                           
-HAL_CAN_ERROR_NOT_READY       (0x00080000U)  //!< Peripheral not ready                                 
-HAL_CAN_ERROR_NOT_STARTED     (0x00100000U)  //!< Peripheral not started                               
-HAL_CAN_ERROR_PARAM           (0x00200000U)  //!< Parameter error                                      
-HAL_CAN_ERROR_INVALID_CALLBACK (0x00400000U) /*!< Invalid Callback error                               
-HAL_CAN_ERROR_INTERNAL        (0x00800000U)  /*!< Internal error   
+HAL_CAN_ERROR_NONE            (0x00000000U)  //!< No error
+HAL_CAN_ERROR_EWG             (0x00000001U)  //!< Protocol Error Warning
+HAL_CAN_ERROR_EPV             (0x00000002U)  //!< Error Passive
+HAL_CAN_ERROR_BOF             (0x00000004U)  //!< Bus-off error
+HAL_CAN_ERROR_STF             (0x00000008U)  //!< Stuff error
+HAL_CAN_ERROR_FOR             (0x00000010U)  //!< Form error
+HAL_CAN_ERROR_ACK             (0x00000020U)  //!< Acknowledgment error
+HAL_CAN_ERROR_BR              (0x00000040U)  //!< Bit recessive error
+HAL_CAN_ERROR_BD              (0x00000080U)  //!< Bit dominant error
+HAL_CAN_ERROR_CRC             (0x00000100U)  //!< CRC error
+HAL_CAN_ERROR_RX_FOV0         (0x00000200U)  //!< Rx FIFO0 overrun error
+HAL_CAN_ERROR_RX_FOV1         (0x00000400U)  //!< Rx FIFO1 overrun error
+HAL_CAN_ERROR_TX_ALST0        (0x00000800U)  //!< TxMailbox 0 transmit failure due to arbitration lost
+HAL_CAN_ERROR_TX_TERR0        (0x00001000U)  //!< TxMailbox 0 transmit failure due to transmit error
+HAL_CAN_ERROR_TX_ALST1        (0x00002000U)  //!< TxMailbox 1 transmit failure due to arbitration lost
+HAL_CAN_ERROR_TX_TERR1        (0x00004000U)  //!< TxMailbox 1 transmit failure due to transmit error
+HAL_CAN_ERROR_TX_ALST2        (0x00008000U)  //!< TxMailbox 2 transmit failure due to arbitration lost
+HAL_CAN_ERROR_TX_TERR2        (0x00010000U)  //!< TxMailbox 2 transmit failure due to transmit error
+HAL_CAN_ERROR_TIMEOUT         (0x00020000U)  //!< Timeout error
+HAL_CAN_ERROR_NOT_INITIALIZED (0x00040000U)  //!< Peripheral not initialized
+HAL_CAN_ERROR_NOT_READY       (0x00080000U)  //!< Peripheral not ready
+HAL_CAN_ERROR_NOT_STARTED     (0x00100000U)  //!< Peripheral not started
+HAL_CAN_ERROR_PARAM           (0x00200000U)  //!< Parameter error
+HAL_CAN_ERROR_INVALID_CALLBACK (0x00400000U) /*!< Invalid Callback error
+HAL_CAN_ERROR_INTERNAL        (0x00800000U)  /*!< Internal error
 */
 
 // This is called by RX0_IRQHandler when there is message at RX FIFO0 buffer
@@ -863,7 +863,7 @@ extern "C" void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *CanHandle)
   {
     _CAN3->setCanError(CanHandle->Instance->ESR);
   }
-#endif 
+#endif
 }
 
 // There is 3 TX mailboxes. Each one has own transmit complete callback function, that we use to pull next message from TX ringbuffer to be sent out in TX mailbox.

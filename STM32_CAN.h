@@ -153,19 +153,19 @@ class STM32_CAN {
       volatile CAN_message_t *buffer;
     } RingbufferTypeDef;
 
-    RingbufferTypeDef rxRing;
-    RingbufferTypeDef txRing;
+    RingbufferTypeDef rxRing = {};
+    RingbufferTypeDef txRing = {};
 
     bool addToRingBuffer(RingbufferTypeDef &ring, const CAN_message_t &msg);
     bool removeFromRingBuffer(RingbufferTypeDef &ring, CAN_message_t &msg);
 
   protected:
-    uint16_t sizeRxBuffer;
-    uint16_t sizeTxBuffer;
+    uint16_t sizeRxBuffer = 0;
+    uint16_t sizeTxBuffer = 0;
 
   private:
     void      initializeFilters();
-    bool      isInitialized() { return rx_buffer != 0; }
+    bool      isInitialized() { return rx_buffer != nullptr; }
     void      initRingBuffer(RingbufferTypeDef &ring, volatile CAN_message_t *buffer, uint32_t size);
     void      initializeBuffers(void);
     bool      isRingBufferEmpty(RingbufferTypeDef &ring);
@@ -175,8 +175,8 @@ class STM32_CAN {
                                                               uint8_t timeseg2, uint8_t sjw);
     uint32_t  getAPB1Clock(void);
 
-    volatile CAN_message_t *rx_buffer;
-    volatile CAN_message_t *tx_buffer;
+    volatile CAN_message_t *rx_buffer = nullptr;
+    volatile CAN_message_t *tx_buffer = nullptr;
 
     uint32_t canError = 0; // Stores latest CAN ESR (error status register) register
 
@@ -200,7 +200,7 @@ class STM32_CAN {
         100000, 30, 16, 13, 2
       }
     };
-	
+
     static constexpr Baudrate_entry_t BAUD_RATE_TABLE_45M[] {
       {
         1000000, 3, 15, 12, 2
