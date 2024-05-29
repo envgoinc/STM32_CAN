@@ -231,12 +231,12 @@ void STM32_CAN::begin( bool retransmission ) {
 #endif
 
   n_pCanHandle->Init.TimeTriggeredMode = DISABLE;
-  n_pCanHandle->Init.AutoBusOff = DISABLE;
+  n_pCanHandle->Init.AutoBusOff = ENABLE;
   n_pCanHandle->Init.AutoWakeUp = DISABLE;
   if (retransmission){ n_pCanHandle->Init.AutoRetransmission  = ENABLE; }
   else { n_pCanHandle->Init.AutoRetransmission  = DISABLE; }
   n_pCanHandle->Init.ReceiveFifoLocked  = DISABLE;
-  n_pCanHandle->Init.TransmitFifoPriority = ENABLE;
+  n_pCanHandle->Init.TransmitFifoPriority = DISABLE;
   n_pCanHandle->Init.Mode = CAN_MODE_NORMAL;
 }
 
