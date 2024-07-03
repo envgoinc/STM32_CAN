@@ -259,13 +259,6 @@ void STM32_CAN::setBaudRate(uint32_t baud)
 
   // Activate CAN TX notification
   HAL_CAN_ActivateNotification( n_pCanHandle, CAN_IT_TX_MAILBOX_EMPTY);
-
-  // Activate CAN ERROR notification
-  HAL_CAN_ActivateNotification( n_pCanHandle, CAN_IT_ERROR);
-  HAL_CAN_ActivateNotification( n_pCanHandle, CAN_IT_BUSOFF);
-  HAL_CAN_ActivateNotification( n_pCanHandle, CAN_IT_LAST_ERROR_CODE);
-  HAL_CAN_ActivateNotification( n_pCanHandle, CAN_IT_ERROR_WARNING);
-  HAL_CAN_ActivateNotification( n_pCanHandle, CAN_IT_ERROR_PASSIVE);
 }
 
 bool STM32_CAN::write(CAN_message_t &CAN_tx_msg, bool sendMB)
@@ -306,7 +299,6 @@ bool STM32_CAN::write(CAN_message_t &CAN_tx_msg, bool sendMB)
   }
   __HAL_CAN_ENABLE_IT(n_pCanHandle, CAN_IT_TX_MAILBOX_EMPTY);
 
-  setCanError((uint32_t)n_pCanHandle->Instance->ESR);
   return ret;
 }
 
@@ -803,14 +795,29 @@ void STM32_CAN::enableFIFO(bool status)
   //Nothing to do here. The FIFO is on by default. This is just to work with code made for Teensy FlexCan.
 }
 
-void STM32_CAN::setCanError(uint32_t error){
-  canError = error;
+uint32_t STM32_CAN::getError(){
+  return n_pCanHandle->ErrorCode;
 }
 
-uint32_t STM32_CAN::getCanError(){
-  return canError;
+uint8_t STM32_CAN::getREC() {
+  return (uint8_t)((n_pCanHandle->Instance->ESR & CAN_ESR_REC) >> CAN_ESR_REC_Pos);
 }
 
+uint8_t STM32_CAN::getTEC() {
+  return (uint8_t)((n_pCanHandle->Instance->ESR & CAN_ESR_TEC) >> CAN_ESR_TEC_Pos);
+}
+
+STM32_CAN::BusState_t STM32_CAN::getBusState() {
+  if((n_pCanHandle->Instance->ESR & CAN_ESR_BOFF) != 0) {
+    return BUS_OFF;
+  } else if((n_pCanHandle->Instance->ESR & CAN_ESR_EPVF) != 0) {
+    return BUS_ERROR;
+  } else if((n_pCanHandle->Instance->ESR & CAN_ESR_EWGF) != 0) {
+    return BUS_WARNING;
+  } else {
+    return BUS_NORMAL;
+  }
+}
 
 /* Interrupt functions
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -844,27 +851,6 @@ HAL_CAN_ERROR_INVALID_CALLBACK (0x00400000U) /*!< Invalid Callback error
 HAL_CAN_ERROR_INTERNAL        (0x00800000U)  /*!< Internal error
 */
 
-// This is called by RX0_IRQHandler when there is message at RX FIFO0 buffer
-extern "C" void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *CanHandle)
-{
-  // use correct CAN instance
-  if (CanHandle->Instance == CAN1)
-  {
-    _CAN1->setCanError(CanHandle->Instance->ESR);
-  }
-#ifdef CAN2
-  else if (CanHandle->Instance == CAN2)
-  {
-    _CAN2->setCanError(CanHandle->Instance->ESR);
-  }
-#endif
-#ifdef CAN3
-  else if (CanHandle->Instance == CAN3)
-  {
-    _CAN3->setCanError(CanHandle->Instance->ESR);
-  }
-#endif
-}
 
 // There is 3 TX mailboxes. Each one has own transmit complete callback function, that we use to pull next message from TX ringbuffer to be sent out in TX mailbox.
 extern "C" void HAL_CAN_TxMailbox0CompleteCallback( CAN_HandleTypeDef *CanHandle )

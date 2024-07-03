@@ -117,8 +117,14 @@ typedef enum CAN_FLTEN {
 } CAN_FLTEN;
 
 class STM32_CAN {
-
   public:
+    typedef enum {
+      BUS_NORMAL,
+      BUS_WARNING,
+      BUS_ERROR,
+      BUS_OFF
+    } BusState_t;
+
     // Default buffer sizes are set to 16. But this can be changed by using constructor in main code.
     STM32_CAN(CAN_TypeDef* canPort, CAN_PINS pins, RXQUEUE_TABLE rxSize = RX_SIZE_16, TXQUEUE_TABLE txSize = TX_SIZE_16);
     // Begin. By default the automatic retransmission is enabled. If it causes problems, use begin(false) to disable it.
@@ -142,8 +148,10 @@ class STM32_CAN {
     void enableMBInterrupts();
     void disableMBInterrupts();
 
-    void setCanError(uint32_t error);
-    uint32_t getCanError();
+    uint32_t getError();
+    uint8_t getREC();
+    uint8_t getTEC();
+    BusState_t getBusState();
 
     // These are public because these are also used from interrupts.
     typedef struct RingbufferTypeDef {
@@ -177,8 +185,6 @@ class STM32_CAN {
 
     volatile CAN_message_t *rx_buffer = nullptr;
     volatile CAN_message_t *tx_buffer = nullptr;
-
-    uint32_t canError = 0; // Stores latest CAN ESR (error status register) register
 
     static constexpr Baudrate_entry_t BAUD_RATE_TABLE_48M[] {
       {
