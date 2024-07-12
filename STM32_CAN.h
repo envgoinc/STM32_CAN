@@ -186,6 +186,7 @@ class STM32_CAN {
     volatile CAN_message_t *rx_buffer = nullptr;
     volatile CAN_message_t *tx_buffer = nullptr;
 
+    // got these values from the following website: http://www.bittiming.can-wiki.info/
     static constexpr Baudrate_entry_t BAUD_RATE_TABLE_48M[] {
       {
         1000000, 3, 16, 13, 2
@@ -222,6 +223,24 @@ class STM32_CAN {
       },
       {
         100000, 25, 18, 15, 2
+      }
+    };
+
+    static constexpr Baudrate_entry_t BAUD_RATE_TABLE_42M[] {
+      {
+        1000000, 3, 14, 11, 2
+      },
+      {
+        500000, 6, 14, 11, 2
+      },
+      {
+        250000, 12, 14, 11, 2
+      },
+      {
+        125000, 21, 16, 13, 2
+      },
+      {
+        100000, 28, 15, 12, 2
       }
     };
 

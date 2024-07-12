@@ -2,6 +2,7 @@
 
 constexpr Baudrate_entry_t STM32_CAN::BAUD_RATE_TABLE_48M[];
 constexpr Baudrate_entry_t STM32_CAN::BAUD_RATE_TABLE_45M[];
+constexpr Baudrate_entry_t STM32_CAN::BAUD_RATE_TABLE_42M[];
 
 static STM32_CAN* _CAN1 = nullptr;
 static CAN_HandleTypeDef     hcan1;
@@ -674,6 +675,20 @@ void STM32_CAN::calculateBaudrate(CAN_HandleTypeDef *CanHandle, int baud)
       return;
     }
   }
+  else if(frequency == 42000000) {
+    for(i=0; i<sizeof(BAUD_RATE_TABLE_42M)/sizeof(Baudrate_entry_t); i++) {
+      if(baud == (int)BAUD_RATE_TABLE_42M[i].baudrate) {
+        break;
+      }
+    }
+    if(i < sizeof(BAUD_RATE_TABLE_42M)/sizeof(Baudrate_entry_t)) {
+      setBaudRateValues(CanHandle, BAUD_RATE_TABLE_42M[i].prescaler,
+                                   BAUD_RATE_TABLE_42M[i].timeseg1,
+                                   BAUD_RATE_TABLE_42M[i].timeseg2,
+                                   1);
+      return;
+    }
+  }
 
   while (sjw <= 4) {
     while (prescaler <= 1024) {
@@ -796,7 +811,9 @@ void STM32_CAN::enableFIFO(bool status)
 }
 
 uint32_t STM32_CAN::getError(){
-  return n_pCanHandle->ErrorCode;
+  uint32_t error = n_pCanHandle->ErrorCode;
+  HAL_CAN_ResetError(n_pCanHandle);
+  return error;
 }
 
 uint8_t STM32_CAN::getREC() {
